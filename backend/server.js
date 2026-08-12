@@ -50,3 +50,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Military Asset Management API running on port ${PORT}`);
 });
+
+export default app;
