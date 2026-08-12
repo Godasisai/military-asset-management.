@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+  
+  --color-military-50: #f8fafc;
+  --color-military-100: #f1f5f9;
+  --color-military-200: #e2e8f0;
+  --color-military-300: #cbd5e1;
+  --color-military-400: #94a3b8;
+  --color-military-500: #64748b;
+  --color-military-600: #475569;
+  --color-military-700: #334155;
+  --color-military-800: #1e293b;
+  --color-military-900: #0f172a;
+  --color-military-950: #020617;
+  
+  --color-tactical-amber: #f59e0b;
+  --color-tactical-red: #ef4444;
+  --color-tactical-green: #10b981;
+}
+
+/* Custom Scrollbar for sleek military tech UI look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #020617;
+  color: #cbd5e1;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom glow animations for status and alerts */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+  }
+}
+
+.pulse-glow-amber {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+/* Card glassmorphism style */
+.glass-card {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}

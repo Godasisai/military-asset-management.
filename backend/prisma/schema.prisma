@@ -1,0 +1,112 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Base {
+  id           Int           @id @default(autoincrement())
+  name         String
+  location     String
+  users        User[]
+  purchases    Purchase[]
+  transfersIn  Transfer[]     @relation("TransfersTo")
+  transfersOut Transfer[]     @relation("TransfersFrom")
+  assignments  Assignment[]
+  expenditures Expenditure[]
+  assets       Asset[]
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  passwordHash String
+  role         String        // 'ADMIN', 'BASE_COMMANDER', 'LOGISTICS_OFFICER'
+  baseId       Int?
+  base         Base?         @relation(fields: [baseId], references: [id])
+  transfers    Transfer[]    @relation("InitiatedBy")
+  auditLogs    AuditLog[]
+}
+
+model EquipmentType {
+  id           Int           @id @default(autoincrement())
+  name         String        // e.g. 'M4 Carbine', 'Humvee', '5.56mm Ammo'
+  category     String        // 'WEAPON', 'VEHICLE', 'AMMUNITION'
+  purchases    Purchase[]
+  transfers    Transfer[]
+  assignments  Assignment[]
+  expenditures Expenditure[]
+  assets       Asset[]
+}
+
+model Asset {
+  id              Int           @id @default(autoincrement())
+  baseId          Int
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId Int
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int           @default(0)
+
+  @@unique([baseId, equipmentTypeId])
+}
+
+model Purchase {
+  id              Int           @id @default(autoincrement())
+  baseId          Int
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId Int
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  createdAt       DateTime      @default(now())
+}
+
+model Transfer {
+  id                   Int           @id @default(autoincrement())
+  sourceBaseId         Int
+  sourceBase           Base          @relation("TransfersFrom", fields: [sourceBaseId], references: [id])
+  destinationBaseId    Int
+  destinationBase      Base          @relation("TransfersTo", fields: [destinationBaseId], references: [id])
+  equipmentTypeId      Int
+  equipmentType        EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity             Int
+  status               String        @default("COMPLETED") // 'PENDING', 'IN_TRANSIT', 'COMPLETED'
+  createdAt            DateTime      @default(now())
+  initiatedById        Int
+  initiatedBy          User          @relation("InitiatedBy", fields: [initiatedById], references: [id])
+}
+
+model Assignment {
+  id              Int           @id @default(autoincrement())
+  baseId          Int
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId Int
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  assignedTo      String
+  status          String        @default("ASSIGNED") // 'ASSIGNED', 'RETURNED'
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Expenditure {
+  id              Int           @id @default(autoincrement())
+  baseId          Int
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId Int
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  reason          String
+  createdAt       DateTime      @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   // 'PURCHASE', 'TRANSFER', 'ASSIGNMENT', 'EXPENDITURE', 'LOGIN'
+  details   String
+  createdAt DateTime @default(now())
+}
